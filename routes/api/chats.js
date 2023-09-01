@@ -10,11 +10,7 @@ router.post(
   "/",
   catchAsync(async (req, res, next) => {
     let users = JSON.parse(req.body.users);
-
-    if (!req.body.users || users?.length < 2) {
-      return res.status(400).send();
-    }
-
+    
     users.push(req.session.user);
 
     let chatData = {
@@ -44,13 +40,13 @@ router.get(
       })
       .sort({ updatedAt: -1 });
 
-    // if (req.query.unreadOnly !== undefined && req.query.unreadOnly == "true") {
-    //   chats = chats.filter(
-    //     (r) =>
-    //       r.latestMessage &&
-    //       !r.latestMessage.readBy.includes(req.session.user._id)
-    //   );
-    // }
+    if (req.query.unreadOnly !== undefined && req.query.unreadOnly == "true") {
+      chats = chats.filter(
+        (r) =>
+          r.latestMessage &&
+          !r.latestMessage.readBy.includes(req.session.user._id)
+      );
+    }
     chats = await User.populate(chats, { path: "latestMessage.sender" });
 
     res.status(200).send(chats);

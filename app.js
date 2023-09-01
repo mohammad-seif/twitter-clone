@@ -5,8 +5,9 @@ const express = require("express");
 const { requireLogin } = require("./middleware");
 require("./database");
 const globalErrHandler = require("./appError/globalErrHandler");
-const PORT = 3003;
+const PORT = 3000;
 const session = require("express-session");
+const analytics = require('./analytics')
 
 const app = express();
 
@@ -71,6 +72,9 @@ app.get("/", requireLogin, (req, res) => {
     userLoggedIn: req.session.user,
     userLoggedInJs: JSON.stringify(req.session.user),
   };
+
+  analytics.page()
+
 
   res.status(200).render("home", payload);
 });
